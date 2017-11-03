@@ -1,0 +1,21 @@
+{
+   "name": "niirrty/niirrty.forms.security",
+   "type": "library",
+   "description": "Form securing methods",
+   "license": "MIT",
+   "authors": [
+      {
+         "name": "Ni Irrty",
+         "email": "niirrty+code@gmail.com"
+      }
+   ],
+   "require": {
+      "php": ">=7.1",
+      "niirrty/niirrty.core": "~0.1"
+   },
+   "autoload": {
+      "psr-4": {
+         "Niirrty\\Forms\\Security\\": "src/"
+      }
+   }
+}

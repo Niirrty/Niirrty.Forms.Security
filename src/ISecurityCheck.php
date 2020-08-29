@@ -1,10 +1,10 @@
 <?php
 /**
  * @author     Ni Irrty <niirrty+code@gmail.com>
- * @copyright  ©2017, Ni Irrty
+ * @copyright  © 2017-2020, Ni Irrty
  * @package    Niirrty\Forms\Security
  * @since      2017-11-03
- * @version    0.1.0
+ * @version    0.3.0
  */
 
 
@@ -19,25 +19,27 @@ namespace Niirrty\Forms\Security;
 interface ISecurityCheck
 {
 
-   /**
-    * Returns the state, if the implementing form security check is based on an usable request. It says nothing about
-    * the request validity!
-    *
-    * @return bool
-    */
-   public function isRequest() : bool;
 
-   /**
-    * Returns the state, if the implementing form security check is based on an VALID request.
-    *
-    * @return bool
-    */
-   public function isValidRequest() : bool;
+    /**
+     * Returns the state, if the implementing form security check is based on an usable request. It says nothing about
+     * the request validity!
+     *
+     * @return bool
+     */
+    public function isRequest(): bool;
 
-   /**
-    * Reloads the states isRequest and isValidRequest, after you have made some changes by the set methods.
-    */
-   public function reload();
+    /**
+     * Returns the state, if the implementing form security check is based on an VALID request.
+     *
+     * @return bool
+     */
+    public function isValidRequest(): bool;
+
+    /**
+     * Reloads the states isRequest and isValidRequest, after you have made some changes by the set methods.
+     */
+    public function reload();
+
 
 }
 

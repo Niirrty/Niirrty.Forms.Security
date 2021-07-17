@@ -1,10 +1,10 @@
 <?php
 /**
  * @author     Ni Irrty <niirrty+code@gmail.com>
- * @copyright  © 2017-2020, Ni Irrty
+ * @copyright  © 2017-2021, Ni Irrty
  * @package    Niirrty\Forms\Security
  * @since      2017-11-03
- * @version    0.3.0
+ * @version    0.4.0
  */
 
 

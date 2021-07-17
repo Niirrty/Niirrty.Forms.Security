@@ -1,23 +1,16 @@
 <?php
 /**
  * @author     Ni Irrty <niirrty+code@gmail.com>
- * @copyright  © 2017-2020, Ni Irrty
+ * @copyright  © 2017-2021, Ni Irrty
  * @package    Niirrty\Forms\Security
  * @since      2017-11-03
- * @version    0.3.0
+ * @version    0.4.0
  */
 
 declare( strict_types=1 );
 
 
 namespace Niirrty\Forms\Security;
-
-
-use function count;
-use function is_array;
-use function preg_split;
-use function strpos;
-use function trim;
 
 
 /**
@@ -29,18 +22,17 @@ class SessionHelper
 {
 
 
-    // <editor-fold desc="// – – –   P R I V A T E   C O N S T R U C T O R   – – – – – – – – – – – – – – – – – – –">
-
+    #region // – – –   P R I V A T E   C O N S T R U C T O R   – – – – – – – – – – – – – – – – – – –
 
     /**
      * Private constructor because the class should only by used by the static way.
      */
     private function __construct() { }
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// – – –   P U B L I C   S T A T I C   M E T H O D S   – – – – – – – – – – – – – – – – –">
+    #region // – – –   P U B L I C   S T A T I C   M E T H O D S   – – – – – – – – – – – – – – – – –
 
     /**
      * Check if the defined session field exists.
@@ -86,19 +78,19 @@ class SessionHelper
      *
      * But its only supported one array level. Deeper will not work!
      *
-     * @param string $fieldName
-     * @param mixed  $defaultValue
+     * @param string     $fieldName
+     * @param mixed $defaultValue
      *
      * @return mixed
      */
-    public static function GetFieldValue( string $fieldName, $defaultValue = false )
+    public static function GetFieldValue( string $fieldName, mixed $defaultValue = false ): mixed
     {
 
         $fieldNameElements = static::extractFieldNameElements( $fieldName );
 
         if ( !isset( $fieldNameElements[ 1 ] ) )
         {
-            return isset( $_SESSION[ $fieldName ] ) ? $_SESSION[ $fieldName ] : $defaultValue;
+            return $_SESSION[ $fieldName ] ?? $defaultValue;
         }
 
         $exists = isset( $_SESSION[ $fieldNameElements[ 0 ] ] )
@@ -125,7 +117,7 @@ class SessionHelper
      *
      * @return boolean
      */
-    public static function SetFieldValue( string $fieldName, $value )
+    public static function SetFieldValue( string $fieldName, mixed $value ): bool
     {
 
         $fieldNameElements = static::extractFieldNameElements( $fieldName );
@@ -168,39 +160,37 @@ class SessionHelper
 
     }
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// – – –   P R O T E C T E D   S T A T I C   M E T H O D S   – – – – – – – – – – – – – –">
+    #region // – – –   P R O T E C T E D   S T A T I C   M E T H O D S   – – – – – – – – – – – – – –
 
-    protected static function extractFieldNameElements( $fieldName )
+    protected static function extractFieldNameElements( $fieldName ): array|bool
     {
 
-        if ( ( false === strpos( $fieldName, '[' ) ) &&
-             ( false === strpos( $fieldName, '.' ) ) )
+        if ( ! \str_contains( $fieldName, '[' ) && ! \str_contains( $fieldName, '.' ) )
         {
             // Use field name as it because there is no separator defined.
             return [ $fieldName ];
         }
 
         // Split at [ or .
-        $elements = preg_split( '~[\[.]~', $fieldName );
+        $elements = \preg_split( '~[\[.]~', $fieldName );
 
-        if ( 2 !== count( $elements ) )
+        if ( 2 !== \count( $elements ) )
         {
             // It not result as 2 elements => Use field name as it
             return [ $fieldName ];
         }
 
         // Remove some white spaces and square brackets from 2nd element
-        $elements[ 1 ] = trim( $elements[ 1 ], "\r\n\t []" );
+        $elements[ 1 ] = \trim( $elements[ 1 ], "\r\n\t []" );
 
         return $elements;
 
     }
 
-
-    // </editor-fold>
+    #endregion
 
 
 }

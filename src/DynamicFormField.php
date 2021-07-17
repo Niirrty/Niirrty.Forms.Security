@@ -1,10 +1,10 @@
 <?php
 /**
  * @author     Ni Irrty <niirrty+code@gmail.com>
- * @copyright  © 2017-2020, Ni Irrty
+ * @copyright  © 2017-2021, Ni Irrty
  * @package    Niirrty\Forms\Security
  * @since      2017-11-03
- * @version    0.3.0
+ * @version    0.4.0
  */
 
 
@@ -12,18 +12,6 @@ declare( strict_types=1 );
 
 
 namespace Niirrty\Forms\Security;
-
-
-use function count;
-use function filter_has_var;
-use function filter_input;
-use function htmlentities;
-use function in_array;
-use function mt_rand;
-use function preg_match;
-use function strlen;
-use function substr;
-use const INPUT_POST;
 
 
 /**
@@ -52,8 +40,7 @@ class DynamicFormField implements ISecurityCheck
 {
 
 
-    // <editor-fold desc="// – – –   P R O T E C T E D   F I E L D S   – – – – – – – – – – – – – – – – – – – – – –">
-
+    #region // – – –   P R O T E C T E D   F I E L D S   – – – – – – – – – – – – – – – – – – – – – –
 
     /**
      * The required name of the form field for incoming form data requests. It can also been undefined if no form
@@ -61,35 +48,28 @@ class DynamicFormField implements ISecurityCheck
      *
      * @var string|null
      */
-    protected $_inName;
+    protected ?string $_inName;
 
     /**
      * This field name should be used for the associated form field for a new request
      *
      * @var string
      */
-    protected $_outName;
+    protected string $_outName;
 
     /**
      * Saves the state if we have currently a request. It says noting about the validity!
      *
      * @var boolean
      */
-    protected $_isRequest;
+    protected bool $_isRequest;
 
     /**
      * Saves the state if we have currently an VALID request.
      *
      * @var boolean
      */
-    protected $_isValidRequest;
-
-    /**
-     * This value should be used as current field value.
-     *
-     * @var string
-     */
-    protected $_value;
+    protected bool $_isValidRequest;
 
     /**
      * Use this session var to store the name of the dynamic form field.
@@ -105,18 +85,18 @@ class DynamicFormField implements ISecurityCheck
      *
      * @var string
      */
-    protected $_sessionFieldName;
+    protected string $_sessionFieldName;
 
     private const ALPHA_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
 
     private const WORD_CHARS  = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
 
-    private static $lastRandoms = [];
+    private static array $lastRandoms = [];
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// – – –   P U B L I C   C O N S T R U C T O R   – – – – – – – – – – – – – – – – – – – –">
+    #region // – – –   P U B L I C   C O N S T R U C T O R   – – – – – – – – – – – – – – – – – – – –
 
     /**
      * Init a new instance.
@@ -129,28 +109,26 @@ class DynamicFormField implements ISecurityCheck
      *                                 $_SESSION[ 'FormStamps' ][ 'MyForm' ] But its only supported one array level.
      *                                 Deeper will not work!
      */
-    public function __construct( string $value = '1', string $sessionFieldName = 'UKFF.LastFieldName' )
+    public function __construct( protected string $value = '1', string $sessionFieldName = 'NDFF.LastFieldName' )
     {
 
         if ( empty( $sessionFieldName ) )
         {
-            $sessionFieldName = 'UKFF.LastFieldName';
+            $sessionFieldName = 'NDFF.LastFieldName';
         }
-
-        $this->_value = $value;
         $this->_sessionFieldName = $sessionFieldName;
 
         $this->reload();
 
     }
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// – – –   P U B L I C   M E T H O D S   – – – – – – – – – – – – – – – – – – – – – – – –">
+    #region // – – –   P U B L I C   M E T H O D S   – – – – – – – – – – – – – – – – – – – – – – – –
 
 
-    # <editor-fold desc="= = =   G E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =">
+    #region = = =   G E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     /**
      * Returns the required name of the form field for incoming form data requests. It can also been undefined if no
@@ -209,7 +187,7 @@ class DynamicFormField implements ISecurityCheck
     public function getValue(): string
     {
 
-        return $this->_value;
+        return $this->value;
 
     }
 
@@ -234,10 +212,10 @@ class DynamicFormField implements ISecurityCheck
 
     }
 
-    # </editor-fold>
+    #endregion
 
 
-    # <editor-fold desc="= = =   S E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =">
+    #region = = =   S E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     /**
      * Sets the name of the session var to store the name of the dynamic form field.
@@ -278,29 +256,29 @@ class DynamicFormField implements ISecurityCheck
     public function setValue( string $value ): DynamicFormField
     {
 
-        $this->_value = $value;
+        $this->value = $value;
 
         return $this;
 
     }
 
-    # </editor-fold>
+    #endregion
 
 
     /**
      * Build the hidden form field and returns it.
      *
-     * @param boolean $asXhtml Generate an XHTML conform HTML element?
-     * @param string  $id      An optional ID attribute
+     * @param boolean     $asXhtml Generate an XHTML conform HTML element?
+     * @param string|null $id      An optional ID attribute
      *
      * @return string
      */
-    public function buildHiddenFieldHtml( bool $asXhtml = false, ?string $id = null )
+    public function buildHiddenFieldHtml( bool $asXhtml = false, ?string $id = null ): string
     {
 
-        $html = '<input type="hidden" name="' . $this->_outName . '" value="' . htmlentities( $this->_value ) . '"';
+        $html = '<input type="hidden" name="' . $this->_outName . '" value="' . \htmlentities( $this->value ) . '"';
 
-        if ( !empty( $id ) )
+        if ( ! empty( $id ) )
         {
             $html .= ' id="' . $id . '"';
         }
@@ -326,12 +304,11 @@ class DynamicFormField implements ISecurityCheck
 
         $this->_isRequest = false;
         $this->_isValidRequest = false;
-        $this->_outName = static::BuildRandomWord( 6, 12 );
+        $this->_outName = static::BuildRandomWord( 6 );
 
-        if ( !SessionHelper::FieldExists( $this->_sessionFieldName ) )
+        if ( ! SessionHelper::FieldExists( $this->_sessionFieldName ) )
         {
             $this->_inName = '';
-
             return;
         }
 
@@ -346,11 +323,11 @@ class DynamicFormField implements ISecurityCheck
 
         $this->_isRequest = true;
 
-        if ( isset( $_POST ) && count( $_POST ) > 0 )
+        if ( isset( $_POST ) && \count( $_POST ) > 0 )
         {
             // Its an POST request
-            if ( filter_has_var( INPUT_POST, $this->_inName ) &&
-                 filter_input( INPUT_POST, $this->_inName ) == $this->_value )
+            if ( \filter_has_var( INPUT_POST, $this->_inName ) &&
+                 \filter_input( INPUT_POST, $this->_inName ) == $this->value )
             {
                 $this->_isValidRequest = true;
             }
@@ -358,8 +335,7 @@ class DynamicFormField implements ISecurityCheck
 
     }
 
-
-    // </editor-fold>
+    #endregion
 
 
     /**

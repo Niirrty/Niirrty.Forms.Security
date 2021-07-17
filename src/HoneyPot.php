@@ -1,10 +1,10 @@
 <?php
 /**
  * @author     Ni Irrty <niirrty+code@gmail.com>
- * @copyright  © 2017-2020, Ni Irrty
+ * @copyright  © 2017-2021, Ni Irrty
  * @package    Niirrty\Forms\Security
  * @since      2017-11-03
- * @version    0.3.0
+ * @version    0.4.0
  */
 
 
@@ -12,11 +12,6 @@ declare( strict_types=1 );
 
 
 namespace Niirrty\Forms\Security;
-
-
-use function filter_has_var;
-use function filter_input;
-use const INPUT_POST;
 
 
 /**
@@ -67,41 +62,26 @@ class HoneyPot implements ISecurityCheck
 {
 
 
-    // <editor-fold desc="// – – –   P R O T E C T E D   F I E L D S   – – – – – – – – – – – – – – – – – – – – – –">
-
-
-    /**
-     * The name of the honeypot form field.
-     *
-     * @var string
-     */
-    protected $_fieldName;
-
-    /**
-     * What request type should be used? (use \INPUT_POST or \INPUT_GET constant)
-     *
-     * @var integer
-     */
-    protected $_requestType;
+    #region // – – –   P R O T E C T E D   F I E L D S   – – – – – – – – – – – – – – – – – – – – – –
 
     /**
      * Is there an request?
      *
      * @type boolean
      */
-    protected $_isRequest;
+    protected bool $_isRequest;
 
     /**
      * Is the current request an valid request?
      *
      * @type boolean
      */
-    protected $_isValidRequest;
+    protected bool $_isValidRequest;
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// – – –   P U B L I C   C O N S T R U C T O R   – – – – – – – – – – – – – – – – – – – –">
+    #region // – – –   P U B L I C   C O N S T R U C T O R   – – – – – – – – – – – – – – – – – – – –
 
     /**
      * Init a new instance.
@@ -109,23 +89,19 @@ class HoneyPot implements ISecurityCheck
      * @param string $fieldName   The name of the honeypot form field.
      * @param int    $requestType What request type should be used? (use \INPUT_POST or \INPUT_GET constant)
      */
-    public function __construct( string $fieldName, int $requestType = INPUT_POST )
+    public function __construct( protected string $fieldName, protected int $requestType = \INPUT_POST )
     {
-
-        $this->_fieldName = $fieldName;
-        $this->_requestType = $requestType;
 
         $this->reload();
 
     }
 
-    // </editor-fold>
+    #endregion
 
 
-    // <editor-fold desc="// – – –   P U B L I C   M E T H O D S   – – – – – – – – – – – – – – – – – – – – – – – –">
+    #region // – – –   P U B L I C   M E T H O D S   – – – – – – – – – – – – – – – – – – – – – – – –
 
-
-    # <editor-fold desc="= = =   G E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =">
+    #region = = =   G E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     /**
      * Returns the name of the honeypot form field.
@@ -135,7 +111,7 @@ class HoneyPot implements ISecurityCheck
     public function getFieldName(): string
     {
 
-        return $this->_fieldName;
+        return $this->fieldName;
 
     }
 
@@ -147,7 +123,7 @@ class HoneyPot implements ISecurityCheck
     public function getRequestType(): int
     {
 
-        return $this->_requestType;
+        return $this->requestType;
 
     }
 
@@ -176,10 +152,10 @@ class HoneyPot implements ISecurityCheck
 
     }
 
-    # </editor-fold>
+    #endregion
 
 
-    # <editor-fold desc="= = =   S E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =">
+    #region = = =   S E T T E R S   = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     /**
      * Sets the name of the honeypot form field.
@@ -191,7 +167,7 @@ class HoneyPot implements ISecurityCheck
     public function setFieldName( string $fieldName ): HoneyPot
     {
 
-        $this->_fieldName = $fieldName;
+        $this->fieldName = $fieldName;
 
         return $this;
 
@@ -207,13 +183,13 @@ class HoneyPot implements ISecurityCheck
     public function setRequestType( int $requestType ): HoneyPot
     {
 
-        $this->_requestType = $requestType;
+        $this->requestType = $requestType;
 
         return $this;
 
     }
 
-    // </editor-fold>
+    #endregion
 
 
     /**
@@ -230,10 +206,10 @@ class HoneyPot implements ISecurityCheck
 
         if ( $asTextArea )
         {
-            return '<textarea name="' . $this->_fieldName . '" class="' . $hideClassName . '" rows="5"></textarea>';
+            return '<textarea name="' . $this->fieldName . '" class="' . $hideClassName . '" rows="5"></textarea>';
         }
 
-        return '<input type="text" name="' . $this->_fieldName . '" class="' . $hideClassName . '" value="">';
+        return '<input type="text" name="' . $this->fieldName . '" class="' . $hideClassName . '" value="">';
 
     }
 
@@ -248,6 +224,7 @@ class HoneyPot implements ISecurityCheck
     {
 
         return '.' . $hideClassName . ' { display: none; visibility: hidden; }';
+
     }
 
     public function __toString()
@@ -266,14 +243,14 @@ class HoneyPot implements ISecurityCheck
         $this->_isRequest = false;
         $this->_isValidRequest = false;
 
-        if ( !filter_has_var( $this->_requestType, $this->_fieldName ) )
+        if ( ! \filter_has_var( $this->requestType, $this->fieldName ) )
         {
             return;
         }
 
         $this->_isRequest = true;
 
-        $honeypotValue = filter_input( $this->_requestType, $this->_fieldName );
+        $honeypotValue = \filter_input( $this->requestType, $this->fieldName );
 
         if ( '' === $honeypotValue )
         {
@@ -284,8 +261,7 @@ class HoneyPot implements ISecurityCheck
 
     }
 
-
-    // </editor-fold>
+    #endregion
 
 
 }

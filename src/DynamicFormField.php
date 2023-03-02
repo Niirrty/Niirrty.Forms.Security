@@ -309,6 +309,7 @@ class DynamicFormField implements ISecurityCheck
         if ( ! SessionHelper::FieldExists( $this->_sessionFieldName ) )
         {
             $this->_inName = '';
+            SessionHelper::SetFieldValue( $this->_sessionFieldName, $this->_outName );
             return;
         }
 
